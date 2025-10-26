@@ -8,6 +8,7 @@ import com.example.UserService.model.LoginResponseModel;
 import com.example.UserService.repository.LoginSessionRepository;
 import com.example.UserService.service.LoginService;
 import com.example.UserService.service.LoginServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 public class UserserviceController {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
     @Autowired
     private LoginService loginService;
@@ -32,7 +33,7 @@ public class UserserviceController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseModel> Validate(@RequestBody LoginDetails login) {
-        logger.info("Trying to login user: {}", login.getUserId());
+        log.info("Trying to login user: {}", login.getUserId());
         Boolean result = loginService.isValidUser(login);
         if (!result) {
             throw new UserServiceException("User registration failed");
@@ -42,7 +43,7 @@ public class UserserviceController {
     @PostMapping("/register")
     public ResponseEntity<LoginResponseModel> registerUser(@RequestBody UserDetails userDetails) {
         // Assuming there's a method in LoginService to handle user registration
-        logger.info("Registering user: {}", userDetails.getUserId());
+        log.info("Registering user: {}", userDetails.getUserId());
         Boolean result = loginService.registerUser(userDetails);
         if (!result) {
             throw new UserServiceException("User registration failed");
@@ -52,11 +53,11 @@ public class UserserviceController {
 
     @GetMapping("/checkSession/{userId}")
     public ResponseEntity<LoginResponseModel>  CheckValidSession(@PathVariable String userId) {
-        logger.info("Checking session for user: {}", userId);
+        log.info("Checking session for user: {}", userId);
         Optional<LoginSession> session = loginSessionRepository.findByUserIdAndIsActiveTrue(userId);
-        logger.info("Checking session for user: {}", session);
+        log.info("Checking session for user: {}", session);
         if (session.isEmpty()) {
-            logger.warn("No active session found for user: {}", userId);
+            log.warn("No active session found for user: {}", userId);
             return new ResponseEntity<>(new LoginResponseModel(false, "No active session found"),HttpStatus.OK);
         }
     return new ResponseEntity<>(new LoginResponseModel(true, "Active session found"), HttpStatus.OK);

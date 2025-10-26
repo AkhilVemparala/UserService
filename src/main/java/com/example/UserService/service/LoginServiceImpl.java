@@ -8,6 +8,7 @@ import com.example.UserService.exception.UserServiceException;
 import com.example.UserService.model.LoginDetails;
 import com.example.UserService.repository.LoginSessionRepository;
 import com.example.UserService.repository.UserDetailsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
     @Autowired
     private UserDetailsRepository customerRepository;
@@ -29,7 +30,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Boolean isValidUser(LoginDetails loginDetails) {
-        logger.info("Checking user is valid for  {}", loginDetails.getUserId());
+        log.info("Checking user is valid for  {}", loginDetails.getUserId());
 
         // Check if user exists
         UserDetails userDetails = customerRepository.findById(loginDetails.getUserId())
@@ -49,7 +50,7 @@ public class LoginServiceImpl implements LoginService {
             LoginSession session = existingSession.get();
             session.setLastUpdated(LocalDateTime.now());
             loginSessionRepository.save(session);
-            logger.info("Existing session updated for {}", loginDetails.getUserId());
+            log.info("Existing session updated for {}", loginDetails.getUserId());
         } else {
             // Create new session
             LoginSession session = new LoginSession();
@@ -59,7 +60,7 @@ public class LoginServiceImpl implements LoginService {
             session.setLastUpdated(LocalDateTime.now());
 
             loginSessionRepository.save(session);
-            logger.info("New login session created for {}", loginDetails.getUserId());
+            log.info("New login session created for {}", loginDetails.getUserId());
         }
 
         return true;
@@ -68,9 +69,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Boolean registerUser(UserDetails userDetails) {
-        logger.info("Registering user with details: {}", userDetails);
+        log.info("Registering user with details: {}", userDetails);
         UserDetails result = customerRepository.save(userDetails);
-        logger.info("Response received {}",userDetails);
+        log.info("Response received {}",userDetails);
         if(result != null) {
             return true;
         }
